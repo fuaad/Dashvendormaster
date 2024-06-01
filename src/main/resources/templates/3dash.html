@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>CRM Admin</title>
+<!-- plugins:css -->
+<link rel="stylesheet" href="vendors/feather/feather.css">
+<link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css">
+<link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+
+
+<link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css">
+
+<link rel="stylesheet" href="css/vertical-layout-light/style.css">
+
+<link rel="shortcut icon" href="images/favicon.png" />
+
+
+
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.dataTables.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.dataTables.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.min.js"></script>
+
+
+</head>
+<body>
+	<div class="container-scroller">
+		<!-- partial:partials/_navbar.html -->
+		<nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+			<div
+				class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+				<a class="navbar-brand brand-logo mr-5" href="index.html"> <!--img src="images/logo.svg" class="mr-2" alt="logo"-->
+					CRM
+				</a> <a class="navbar-brand brand-logo-mini" href="index.html"><img
+					src="images/logo-mini.svg" alt="logo" /></a>
+			</div>
+			<div
+				class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+				<button class="navbar-toggler navbar-toggler align-self-center"
+					type="button" data-toggle="minimize">
+					<span class="icon-menu"></span>
+				</button>
+				<ul class="navbar-nav mr-lg-2">
+					<li class="nav-item nav-search d-none d-lg-block">logo2 -
+						<p th:text="${supplierId}"></p>
+					</li>
+				</ul>
+				<ul class="navbar-nav navbar-nav-right">
+					
+					<li class="nav-item nav-profile dropdown"><a
+						class="nav-link dropdown-toggle" href="#" data-toggle="dropdown"
+						id="profileDropdown"> <img src="images/faces/profilepic.png"
+							alt="profile" />
+					</a>
+						<div class="dropdown-menu dropdown-menu-right navbar-dropdown"
+							aria-labelledby="profileDropdown">
+							<a class="dropdown-item"> <i class="ti-settings text-primary"></i>
+								Settings
+							</a> <a class="dropdown-item" href="/CRM/logout"> <i
+								class="ti-power-off text-primary"></i> Logout
+							</a>
+						</div></li>
+
+				</ul>
+				<button
+					class="navbar-toggler navbar-toggler-right d-lg-none align-self-center"
+					type="button" data-toggle="offcanvas">
+					<span class="icon-menu"></span>
+				</button>
+			</div>
+		</nav>
+		<!-- partial -->
+		<div class="container-fluid page-body-wrapper">
+			<!-- partial:partials/_settings-panel.html -->
+
+			
+			<!-- partial -->
+			<!-- partial:partials/_sidebar.html -->
+			<nav class="sidebar sidebar-offcanvas" id="sidebar">
+				<ul class="nav">
+				<li class="nav-item"><a class="nav-link" href="/CRM/dashboard">
+							<i class="icon-grid menu-icon"></i> <span class="menu-title">Dashboard</span>
+					</a></li>
+					<li class="nav-item"><a class="nav-link" href="/CRM/addProduct">
+							<i class="icon-grid menu-icon"></i> <span class="menu-title">Product</span>
+					</a></li>
+					<li class="nav-item"><a class="nav-link" href="/CRM/addSupplier">
+							<i class="icon-grid menu-icon"></i> <span class="menu-title">Supplier</span>
+					</a></li>
+
+				</ul>
+			</nav>
+			<!-- partial -->
+			<div class="main-panel">
+				<div class="content-wrapper">
+					<div class="row">
+						<div class="col-md-12">
+							<h3>Dashboard</h3>
+			
+						</div>
+						<div class="col-md-12">
+							<div class="card">
+					         	<div class="card-body">
+					            	<h4 class="card-title">Product List</h4>
+									<table id="productTable" class="table table-bordered table-striped">
+									 	<thead>
+									    	<tr>
+									                <th>Product</th>
+									                <th>Supplier</th>
+									                <th>Contact Name</th>
+									                <th>Contact Phone</th>
+									                <th>Email</th>
+									        </tr>
+									     </thead>
+									    <tbody></tbody>
+									</table>
+								<script>
+										$(document).ready(function() {
+											var table = new DataTable('#productTable', {
+												 
+												   layout: {
+												        topStart: {
+												            buttons: ['copyHtml5', 'excelHtml5', 'csvHtml5', 'pdfHtml5']
+												        }
+												    }
+											 });
+											var data;
+											var settings = {
+													  "url": "http://localhost:8080/CRM/getAllProductsps",
+													  "method": "GET",
+													  "timeout": 0,
+													  
+													};
+
+													$.ajax(settings).done(function (response) {
+													  console.log(response);
+													  data=response;
+													  
+													  data.forEach(function(item) {
+											                item.suppliers.forEach(function(supplier) {
+											                    supplier.contacts.forEach(function(contact) {
+											                        table.row.add([item.productName, supplier.name, contact.name, contact.phone, contact.email]).draw();
+											                    });
+											                });
+											            });
+													});
+											
+											 
+										});
+										
+										</script>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- content-wrapper ends -->
+				<!-- partial:partials/_footer.html -->
+				<footer class="footer">
+					<div
+						class="d-sm-flex justify-content-center justify-content-sm-between">
+						<span
+							class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright
+							2024. All rights reserved.</span>
+
+					</div>
+					<div
+						class="d-sm-flex justify-content-center justify-content-sm-between">
+						<span
+							class="text-muted text-center text-sm-left d-block d-sm-inline-block">Developed
+							by <a href="https://www.linkedin.com/in/fuhad-ali/"
+							target="_blank">Fuhad </a>
+						</span>
+					</div>
+				</footer>
+				<!-- partial -->
+			</div>
+			<!-- main-panel ends -->
+		</div>
+		<!-- page-body-wrapper ends -->
+	</div>
+	<!-- container-scroller -->
+
+	
+
+	<!-- End plugin js for this page -->
+	<!-- inject:js -->
+	<script src="js/off-canvas.js"></script>
+	<script src="js/hoverable-collapse.js"></script>
+	<script src="js/template.js"></script>
+	<script src="js/settings.js"></script>
+	<script src="js/todolist.js"></script>
+	<!-- endinject -->
+	<!-- End custom js for this page-->
+</body>
+
+</html>
+
